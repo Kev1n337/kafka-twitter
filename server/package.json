@@ -10,7 +10,9 @@
   "author": "Kevin Linne",
   "license": "ISC",
   "dependencies": {
+    "@types/express": "^4.11.1",
     "@types/node": "^10.0.9",
+    "express": "^4.16.3",
     "kafka-node": "^2.6.1",
     "mongodb": "^3.1.0-beta4"
   }

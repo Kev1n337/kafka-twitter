@@ -1,12 +1,16 @@
 import * as kafka from "kafka-node";
 import {MongoClient, Db, MongoError} from 'mongodb';
 import DbClient = require("./common/DbClient");
-
+import * as express from 'express';
+import {Request, Response} from 'express';
 
 class App {
+
+  public db;
+
   public async start() {
     try {
-      let db = await DbClient.connect();
+      this.db = await DbClient.connect();
 
       const client = new kafka.KafkaClient({kafkaHost: 'localhost:9092'});
       const topics = [
@@ -14,6 +18,7 @@ class App {
           topic: "twitter_json_01"
         }
       ];
+
       const options = {
         autoCommit: true,
         fetchMaxWaitMs: 1000,
@@ -23,12 +28,12 @@ class App {
 
       const consumer = new kafka.Consumer(client, topics, options);
 
-      consumer.on("message", function(message) {
-        db.collection(message.topic).insertOne(message);
+      consumer.on("message", (message) => {
+        this.db.collection(message.topic).insertOne(message);
         console.log(message);
       });
 
-      consumer.on("error", function(err) {
+      consumer.on("error", (err) => {
         console.log("error", err);
       });
     } catch (err) {
@@ -40,15 +45,14 @@ class App {
 const app = new App();
 app.start();
 
-class Tweet {
-  topic: string;
-  value: string;
-  offset: number;
-  partition: number;
-  highWaterOffset: number;
-  key: string;
-  timestamp: Date;
-}
+let router = express();
 
+router.listen(8080);
+
+router.get("/collection/:stream", (req: Request, res: Response) => {
+  app.db.collection(req.params['stream']).find().toArray().then((tweets: Tweet[]) => {
+    res.status(200).json({tweets: tweets});
+  });
+});
 
 
