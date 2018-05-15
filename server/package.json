@@ -2,14 +2,16 @@
   "name": "kafka-server",
   "version": "1.0.0",
   "description": "A rest server piping kafka streams",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kevin Linne",
   "license": "ISC",
   "dependencies": {
-    "kafka-node": "^2.6.1"
+    "@types/node": "^10.0.9",
+    "kafka-node": "^2.6.1",
+    "mongodb": "^3.1.0-beta4"
   }
 }
