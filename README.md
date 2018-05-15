@@ -7,34 +7,36 @@
 3. Compile Kafka-Connect-Module with 
 
 ```
-cd kafka-connect-twitter 
-mvn clean package
-cd target
-tar -xvf kafka-connect-twitter-0.2-SNAPSHOT.tar.gz
+$ cd kafka-connect-twitter 
+$ mvn clean package
+$ cd target
+$ tar -xvf kafka-connect-twitter-0.2-SNAPSHOT.tar.gz
 ```
 To get Kafka Connect use the connector, the schema-registry configuration file needs to be modified
 
 `etc/schema-registry/connect-avro-distributed.properties` needs the following line added: 
 
-`plugin.path=share/java,/home/rmoff/kafka-connect-twitter/`
+```
+plugin.path=share/java,/PATH_TO_REPO/kafka-connect-twitter/
+```
 
 Restart confluent Connect:
 
 ```
-confluent stop connect
-confluent start connect
+$ confluent stop connect
+$ confluent start connect
 ```
 
 After the Twitter API keys are added to `twitter_source.json`, it can be loaded.
 
 ```
-confluent load twitter_source -d twitter-source.json
+$ confluent load twitter_source -d twitter-source.json
 ```
 
 Make sure tweets are displayed running:
 
 ```
-kafka-console-consumer --bootstrap-server localhost:9092 --from-beginning --topic
+$ kafka-console-consumer --bootstrap-server localhost:9092 --from-beginning --topic twitter_json_01|jq '.Text'
 ```
 
 ## Troubleshooting
