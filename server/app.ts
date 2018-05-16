@@ -3,6 +3,8 @@ import {MongoClient, Db, MongoError} from 'mongodb';
 import DbClient = require("./common/DbClient");
 import * as express from 'express';
 import {Request, Response} from 'express';
+import * as request from 'request-promise';
+import bodyParser = require ("body-parser");
 
 class App {
 
@@ -30,7 +32,7 @@ class App {
 
       consumer.on("message", (message) => {
         this.db.collection(message.topic).insertOne(message);
-        console.log(message);
+        //console.log(message);
       });
 
       consumer.on("error", (err) => {
@@ -47,31 +49,62 @@ app.start();
 
 let router = express();
 
+
+
+router.use(bodyParser.json());
+
+router.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 router.listen(8080);
 
 router.get("/collection/:stream", (req: Request, res: Response) => {
-/*  res.set('Content-Type', 'application/json');
-  res.write('[');
-  var prevChunk = null;
-
-  app.db.collection(req.params['stream']).find().limit(10000)
-    .on('data', function onData(data) {
-      if (prevChunk) {
-        res.write(JSON.stringify(prevChunk) + ',');
-      }
-      prevChunk = data;
+  let cursor = app.db.collection(req.params['stream']).find().limit(1000).stream()
+    .on("data", function(d) {
+      res.write(JSON.stringify(d));
     })
-    .on('end', function onEnd() {
-      if (prevChunk) {
-        res.write(JSON.stringify(prevChunk));
-      }
-      res.end(']');
+  cursor.stream().on("end", function() {
+    res.end();
+  });
+});
+
+router.post("/ksql", function(req: Request, res: Response) {
+  request({
+    method: 'POST',
+    body: {
+      'ksql': req.body['ksql']
+    },
+    uri: 'http://localhost:8088/ksql',
+    json: true
+  }).then((resp) => {
+    res.status(200).json(resp);
+  })
+    .catch((err) => {
+      res.status(500).json({error: err});
     });
-    */
-  let query = app.db.collection(req.params['stream']).find().limit(10000)
-  query.stream().on("data", function(d) { res.json(d); });
-  query.stream().on("end", function() { console.log("done"); res.end(); });
+
 });
 
 
+router.post('/query', function(req: Request, res: Response) {
+
+
+  request({
+    method: 'POST',
+    body: {
+      'ksql': req.body['ksql']
+    },
+    uri: 'http://localhost:8088/query',
+    json: true
+  }).on('data', (data: Buffer) => {
+    let buff = new Buffer(data.toString(), 'utf8');
+    res.write(data.toString('utf8'));
+  }).on('end', () => {
+    res.end();
+  })
+});
 

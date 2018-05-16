@@ -9,7 +9,7 @@ GET localhost:8080/collection/twitter_json_01
 
 ###
 
-POST localhost:8088/ksql
+POST localhost:8080/ksql
 Accept: application/json
 Content-Type: application/json
 
@@ -19,4 +19,15 @@ Content-Type: application/json
 
 ###
 
-POST localhost:8088/query
+POST localhost:8080/query HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "ksql": "SELECT * FROM twitter;",
+  "streamsProperties": {
+    "ksql.streams.auto.offset.reset": "earliest"
+  }
+}
+
+###
