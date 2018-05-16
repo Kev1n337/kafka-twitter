@@ -8,6 +8,8 @@ import { MatGridListModule, MatCardModule, MatMenuModule, MatIconModule, MatButt
 import { NavigationComponent } from './navigation/navigation.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import {AppRoutingModule} from './routing-module.module';
+import {KsqlService} from './ksql.service';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -27,9 +29,10 @@ import {AppRoutingModule} from './routing-module.module';
     MatToolbarModule,
     MatSidenavModule,
     MatListModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [KsqlService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
