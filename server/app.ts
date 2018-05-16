@@ -50,9 +50,28 @@ let router = express();
 router.listen(8080);
 
 router.get("/collection/:stream", (req: Request, res: Response) => {
-  app.db.collection(req.params['stream']).find().toArray().then((tweets: Tweet[]) => {
-    res.status(200).json({tweets: tweets});
-  });
+/*  res.set('Content-Type', 'application/json');
+  res.write('[');
+  var prevChunk = null;
+
+  app.db.collection(req.params['stream']).find().limit(10000)
+    .on('data', function onData(data) {
+      if (prevChunk) {
+        res.write(JSON.stringify(prevChunk) + ',');
+      }
+      prevChunk = data;
+    })
+    .on('end', function onEnd() {
+      if (prevChunk) {
+        res.write(JSON.stringify(prevChunk));
+      }
+      res.end(']');
+    });
+    */
+  let query = app.db.collection(req.params['stream']).find().limit(10000)
+  query.stream().on("data", function(d) { res.json(d); });
+  query.stream().on("end", function() { console.log("done"); res.end(); });
 });
+
 
 
