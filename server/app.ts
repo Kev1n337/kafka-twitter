@@ -5,11 +5,15 @@ import * as express from 'express';
 import {Request, Response} from 'express';
 import * as request from 'request-promise';
 import bodyParser = require ("body-parser");
+import * as socket from 'socket.io';
+import {Socket} from 'socket.io';
+import {Topic} from './model/Topic';
+import {Tweet} from './model/Tweet';
+
 
 class App {
 
   public db;
-
   public async start() {
     try {
       this.db = await DbClient.connect();
@@ -17,7 +21,7 @@ class App {
       const client = new kafka.KafkaClient({kafkaHost: 'localhost:9092'});
       const topics = [
         {
-          topic: "twitter_json_01"
+          topic: "twitter_germany"
         }
       ];
 
@@ -49,7 +53,7 @@ app.start();
 
 let router = express();
 
-
+let germany = new Topic('Germany');
 
 router.use(bodyParser.json());
 
@@ -60,7 +64,57 @@ router.use(function (req, res, next) {
   next();
 });
 
-router.listen(8080);
+let server = router.listen(8080);
+
+let io = socket(server);
+
+let germanCache = "";
+
+io.on('connection', (socket) => {
+  console.log('made socket connection', socket.id);
+
+  socket.on('germany', function( user ){
+    request({
+      method: 'POST',
+      body: {
+        'ksql': 'SELECT CREATEDAT, USER_NAME, TEXT FROM GERMANY;',
+        'streamsProperties': {
+          'ksql.streams.auto.offset.reset': 'earliest'
+        }
+      },
+      uri: 'http://localhost:8088/query',
+      json: true
+    }).on('data', (data: Buffer) => {
+      let jsonString = data.toString('utf8').trim();
+      if(jsonString != "") {
+        try {
+          let newString = germanCache + jsonString;
+
+          let inArray = '[' + newString.replace(/\n/g, ",") + ']';
+
+          let parsedArray = JSON.parse(inArray);
+          for (let single of parsedArray) {
+            let object = single.row.columns;
+            let tweet = new Tweet(object[0], object[1], object[2])
+            germany.tweets.push(tweet);
+            socket.emit('tweets', tweet);
+          }
+          germanCache = "";
+        } catch(e) {
+          germanCache += jsonString;
+          console.log(e);
+        }
+
+        if (germany.tweets.length > 10000) {
+          germany.tweets.shift();
+        }
+      }
+    });
+  });
+
+
+
+});
 
 router.get("/collection/:stream", (req: Request, res: Response) => {
   let cursor = app.db.collection(req.params['stream']).find().limit(1000).stream()
@@ -91,8 +145,6 @@ router.post("/ksql", function(req: Request, res: Response) {
 
 
 router.post('/query', function(req: Request, res: Response) {
-
-
   request({
     method: 'POST',
     body: {
@@ -101,10 +153,32 @@ router.post('/query', function(req: Request, res: Response) {
     uri: 'http://localhost:8088/query',
     json: true
   }).on('data', (data: Buffer) => {
-    let buff = new Buffer(data.toString(), 'utf8');
     res.write(data.toString('utf8'));
   }).on('end', () => {
     res.end();
   })
 });
 
+router.get('/tweets/:topic', function(req: Request, res: Response) {
+  let topic = req.params['topic'];
+  request({
+    method: 'POST',
+    body: {
+      'ksql': 'SELECT * FROM ' + topic
+    },
+    uri: 'http://localhost:8088/query',
+    json: true
+  }).on('data', (data: Buffer) => {
+    let obj = data.toString('utf8');
+    switch(topic) {
+      case 'germany':
+        germany.tweets.push(obj);
+        if (germany.tweets.length > 100) {
+          germany.tweets.shift();
+        }
+        break;
+    }
+  }).on('end', () => {
+    res.end();
+  })
+});

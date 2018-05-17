@@ -14,10 +14,12 @@
     "@types/node": "^10.0.9",
     "@types/request": "^2.47.0",
     "@types/request-promise": "^4.1.41",
+    "@types/socket.io": "^1.4.33",
     "express": "^4.16.3",
     "kafka-node": "^2.6.1",
     "mongodb": "^3.1.0-beta4",
     "request": "^2.86.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "socket.io": "^2.1.0"
   }
 }

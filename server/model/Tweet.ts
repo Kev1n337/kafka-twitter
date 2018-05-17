@@ -1,9 +1,11 @@
-class Tweet {
-  topic: string;
-  value: string;
-  offset: number;
-  partition: number;
-  highWaterOffset: number;
-  key: string;
-  timestamp: Date;
+export class Tweet {
+  time: string;
+  name: string;
+  text: string;
+
+  constructor(time: string, name: string, text: string) {
+    this.time = time;
+    this.name = name;
+    this.text = text;
+  }
 }
