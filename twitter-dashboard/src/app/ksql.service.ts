@@ -3,13 +3,30 @@ import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {http} from 'stream-http';
 import * as querystring from 'querystring';
+import * as socket from 'socket.io-client';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KsqlService {
 
-  constructor(private http: HttpClient) {  }
+  private socket;
+
+  constructor(private http: HttpClient) {
+
+  }
+
+  public initSocket(): void {
+    this.socket = socket('http://localhost:8080');
+    this.socket.emit('germany');
+  }
+
+  public onMessage(): Observable<any> {
+    return new Observable<any>(observer => {
+      this.socket.on('tweets', (data: any) => observer.next(data));
+    });
+  }
 
   getTwitter() {
     this.http.post('http://localhost:8080/ksql', {'ksql': 'LIST TOPICS;'}).toPromise()
@@ -22,8 +39,9 @@ export class KsqlService {
   }
 
   getTopic() {
-    // return this.http.post('http://localhost:8080/query', {'ksql': 'SELECT * FROM twitter;'});
+    this.http.post('http://localhost:8080/query', {'ksql': 'SELECT * FROM germany;'}).forEach((d) => { console.log(d); });
 
+    /*
     const postData = querystring.stringify({
       'ksql': 'SELECT * FROM twitter;'
     });
@@ -48,6 +66,6 @@ export class KsqlService {
 
     postReq.write(postData);
     postReq.end();
-
+    */
   }
 }

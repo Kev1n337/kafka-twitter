@@ -14,21 +14,27 @@ export class TwitterDashboardComponent implements OnInit {
     { title: 'Card 3', cols: 1, rows: 2 },
     { title: 'Card 4', cols: 1, rows: 1 }
   ];
+  data = [];
 
   constructor(private ksql: KsqlService) {}
 
   ngOnInit() {
+
+
+
+    this.ksql.initSocket();
+    this.ksql.onMessage().subscribe((data: any) => {
+      console.log(this.data.length);
+      this.data.push(data);
+
+      if (this.data.length > 10000) {
+        this.data.shift();
+      }
+    });
+
     this.ksql.getTwitter();
-    this.ksql.getTopic();
-    /*this.ksql.getTopic().subscribe(
-    data => {
-      console.log(data);
-    },
-    (err) => {
-      console.log(err);
-    },
-    () => {
-      console.log('Comp');
-    });*/
+
   }
+
+
 }
