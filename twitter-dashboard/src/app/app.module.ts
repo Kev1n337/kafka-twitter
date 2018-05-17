@@ -4,18 +4,30 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { TwitterDashboardComponent } from './twitter-dashboard/twitter-dashboard.component';
-import { MatGridListModule, MatCardModule, MatMenuModule, MatIconModule, MatButtonModule, MatToolbarModule, MatSidenavModule, MatListModule } from '@angular/material';
+import {
+  MatGridListModule,
+  MatCardModule,
+  MatMenuModule,
+  MatIconModule,
+  MatButtonModule,
+  MatToolbarModule,
+  MatSidenavModule,
+  MatListModule,
+  MatTableModule
+} from '@angular/material';
 import { NavigationComponent } from './navigation/navigation.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import {AppRoutingModule} from './routing-module.module';
 import {KsqlService} from './ksql.service';
 import {HttpClientModule} from '@angular/common/http';
+import { TweetFeedComponent } from './tweet-feed/tweet-feed.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TwitterDashboardComponent,
-    NavigationComponent
+    NavigationComponent,
+    TweetFeedComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +42,8 @@ import {HttpClientModule} from '@angular/common/http';
     MatSidenavModule,
     MatListModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    MatTableModule
   ],
   providers: [KsqlService],
   bootstrap: [AppComponent]

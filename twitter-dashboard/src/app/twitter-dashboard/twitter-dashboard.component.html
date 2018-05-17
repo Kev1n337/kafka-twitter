@@ -1,11 +1,14 @@
 <div class="grid-container">
   <h1 class="mat-h1">Dashboard</h1>
-  <mat-grid-list cols="2" rowHeight="350px">
-    <mat-grid-tile *ngFor="let card of cards" [colspan]="card.cols" [rowspan]="card.rows">
+
+
+
+  <mat-grid-list cols="2" rowHeight="500px">
+    <mat-grid-tile [colspan]="2" [rowspan]="1">
       <mat-card class="dashboard-card">
         <mat-card-header>
           <mat-card-title>
-            {{card.title}}
+            Feed containing {{this.data.length}} tweets
             <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
               <mat-icon>more_vert</mat-icon>
             </button>
@@ -16,9 +19,29 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div>Card Content Here</div>
+          <table mat-table #table [dataSource]="dataSource">
+
+            <ng-container matColumnDef="time">
+              <th mat-header-cell *matHeaderCellDef> Time </th>
+              <td mat-cell *matCellDef="let element"> {{element.time}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="text">
+              <th mat-header-cell *matHeaderCellDef> Text </th>
+              <td mat-cell *matCellDef="let element"> {{element.text}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
+
   </mat-grid-list>
 </div>
