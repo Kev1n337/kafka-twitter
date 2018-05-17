@@ -69,6 +69,7 @@ let server = router.listen(8080);
 let io = socket(server);
 
 let germanCache = "";
+let germanErrorCount = 0;
 
 io.on('connection', (socket) => {
   console.log('made socket connection', socket.id);
@@ -102,7 +103,12 @@ io.on('connection', (socket) => {
           germanCache = "";
         } catch(e) {
           germanCache += jsonString;
+          if(germanErrorCount++ > 100) {
+            germanErrorCount = 0;
+            germanCache = "";
+          }
           console.log(e);
+
         }
 
         if (germany.tweets.length > 10000) {
