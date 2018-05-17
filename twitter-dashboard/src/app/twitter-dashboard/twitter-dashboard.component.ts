@@ -6,7 +6,7 @@ import {KsqlService} from '../ksql.service';
   templateUrl: './twitter-dashboard.component.html',
   styleUrls: ['./twitter-dashboard.component.css']
 })
-export class TwitterDashboardComponent implements OnInit{
+export class TwitterDashboardComponent implements OnInit {
 
   cards = [
     { title: 'Card 1', cols: 2, rows: 1 },
@@ -19,7 +19,8 @@ export class TwitterDashboardComponent implements OnInit{
 
   ngOnInit() {
     this.ksql.getTwitter();
-    this.ksql.getTopic().subscribe(
+    this.ksql.getTopic();
+    /*this.ksql.getTopic().subscribe(
     data => {
       console.log(data);
     },
@@ -28,6 +29,6 @@ export class TwitterDashboardComponent implements OnInit{
     },
     () => {
       console.log('Comp');
-    });
+    });*/
   }
 }

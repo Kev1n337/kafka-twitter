@@ -22,8 +22,12 @@
     "@angular/platform-browser": "^6.0.0",
     "@angular/platform-browser-dynamic": "^6.0.0",
     "@angular/router": "^6.0.0",
+    "buffer": "^5.1.0",
+    "buffer-v6-polyfill": "^1.0.5",
     "core-js": "^2.5.4",
+    "querystring": "^0.2.0",
     "rxjs": "^6.0.0",
+    "stream-http": "^2.8.2",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
