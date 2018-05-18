@@ -1,71 +1,39 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {tap} from 'rxjs/operators';
 import {http} from 'stream-http';
-import * as querystring from 'querystring';
 import * as socket from 'socket.io-client';
-import {Observable} from 'rxjs';
+import {Subject} from 'rxjs';
+import {Tweet} from './tweet.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KsqlService {
 
+  public tweets: Tweet[] = [];
   private socket;
 
-  constructor(private http: HttpClient) {
+  private germanTweetAddedSource = new Subject<Tweet>();
+  germanTweetAdded$ = this.germanTweetAddedSource.asObservable();
 
+  private germanTweetsFetchedSource = new Subject<void>();
+  germanTweetsFetched$ = this.germanTweetsFetchedSource.asObservable();
+
+  constructor(private httpClient: HttpClient) {
+    this.httpClient.get('http://localhost:8080/collection/germany').subscribe((data: any) => {
+      this.tweets = data.tweets;
+      console.log(this.tweets.length);
+      this.germanTweetsFetchedSource.next();
+    });
   }
 
   public initSocket(): void {
     this.socket = socket('http://localhost:8080');
     this.socket.emit('germany');
-  }
-
-  public onMessage(): Observable<any> {
-    return new Observable<any>(observer => {
-      this.socket.on('tweets', (data: any) => observer.next(data));
+    this.socket.on('tweets', (data: any) => {
+      console.log('Tweet via WS');
+      this.tweets.push(data);
+      this.germanTweetAddedSource.next(data);
     });
-  }
-
-  getTwitter() {
-    this.http.post('http://localhost:8080/ksql', {'ksql': 'LIST TOPICS;'}).toPromise()
-      .then((el: any) => {
-        console.log(el);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  getTopic() {
-    this.http.post('http://localhost:8080/query', {'ksql': 'SELECT * FROM germany;'}).forEach((d) => { console.log(d); });
-
-    /*
-    const postData = querystring.stringify({
-      'ksql': 'SELECT * FROM twitter;'
-    });
-
-    const postOptions = {
-      host: 'http://localhost',
-      port: '8080',
-      path: '/query',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    const postReq = http.request(postOptions, (res) => {
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        console.log('Response: ' + chunk);
-      });
-    });
-
-    postReq.write(postData);
-    postReq.end();
-    */
   }
 }

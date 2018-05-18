@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {KsqlService} from '../ksql.service';
+import {Tweet} from '../tweet.model';
 
 @Component({
   selector: 'app-hashtags',
@@ -14,16 +15,28 @@ export class HashtagsComponent implements OnInit {
   constructor(private ksql: KsqlService) { }
 
   ngOnInit() {
-    this.ksql.onMessage().subscribe((value) => {
-      for (const tag of value.hashtags) {
-        if (this.dataDict[tag]) {
-          this.dataDict[tag]++;
-        } else {
-          this.dataDict[tag] = 1;
-        }
-      }
-      this.sortData();
+    this.ksql.germanTweetsFetched$.subscribe(() => {
+      const hashtagsCollections = this.ksql.tweets.map(curTweet => curTweet.hashtags);
+      hashtagsCollections.forEach((hashtags: string[]) => {
+        console.log('CALC');
+        this.calculateHashtags(hashtags);
+      });
     });
+
+    this.ksql.germanTweetAdded$.subscribe((tweet: Tweet) => {
+      this.calculateHashtags(tweet.hashtags);
+    });
+  }
+
+  calculateHashtags(hashtags: string[]) {
+    for (const tag of hashtags) {
+      if (this.dataDict[tag]) {
+        this.dataDict[tag]++;
+      } else {
+        this.dataDict[tag] = 1;
+      }
+    }
+    this.sortData();
   }
 
   sortData() {
@@ -31,5 +44,4 @@ export class HashtagsComponent implements OnInit {
     items.sort((first: any, second: any) => second[1] - first[1]);
     this.displayTags = items.slice(0, 5);
   }
-
 }

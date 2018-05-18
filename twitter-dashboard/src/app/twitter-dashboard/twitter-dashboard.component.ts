@@ -15,16 +15,6 @@ export class TwitterDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.ksql.initSocket();
-    this.ksql.onMessage().subscribe((data: any) => {
-      this.data.push(data);
-      if (this.data.length > 10000) {
-        this.data.shift();
-      }
-      console.log(this.data.length);
-    });
-
-    // this.ksql.getTwitter();
-
   }
 
 
