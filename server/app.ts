@@ -33,6 +33,7 @@ request({
       object[3] = JSON.parse(object[3]).map(entity => entity.Text);
       let tweet = new Tweet(object[0], object[1], object[2], object[3]);
       germany.tweets.push(tweet);
+      if(germany.tweets.length > 10000) { germany.tweets.shift(); }
       germanEmitter.emit('germanTweet', tweet);
       console.log(germany.tweets.length);
     } catch (e) {
