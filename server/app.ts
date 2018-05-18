@@ -6,7 +6,6 @@ import {Request, Response} from 'express';
 import * as request from 'request-promise';
 import bodyParser = require ("body-parser");
 import * as socket from 'socket.io';
-import {Socket} from 'socket.io';
 import {Topic} from './model/Topic';
 import {Tweet} from './model/Tweet';
 
@@ -35,12 +34,7 @@ class App {
       const consumer = new kafka.Consumer(client, topics, options);
 
       consumer.on("message", (message) => {
-        this.db.collection(message.topic).insertOne(message);
-        //console.log(message);
-      });
-
-      consumer.on("error", (err) => {
-        console.log("error", err);
+        // this.db.collection(message.topic).insertOne(message);
       });
     } catch (err) {
       console.log(err);
@@ -68,10 +62,6 @@ let server = router.listen(8080);
 
 let io = socket(server);
 
-let germanCache = "";
-let germanErrorCount = 0;
-let germanCachedMessage = "";
-
 io.on('connection', (socket) => {
   console.log('made socket connection', socket.id);
 
@@ -87,42 +77,16 @@ io.on('connection', (socket) => {
       uri: 'http://localhost:8088/query',
       json: true
     }).on('data', (data: Buffer) => {
-      let jsonString = data.toString('utf8').trim();
-      if(jsonString != "") {
+      data.toString('utf8').trim().split("\n").forEach(line => {
         try {
-          let newString = germanCache + jsonString;
+          let object = JSON.parse(line).row.columns;
+          object[3] = JSON.parse(object[3]).map(entity => entity.Text);
+          let tweet = new Tweet(object[0], object[1], object[2], object[3]);
+          germany.tweets.push(tweet);
+          socket.emit('tweets', tweet);
+        } catch (e) {}
+      });
 
-          let inArray = '[' + newString.replace(/\n/g, ",") + ']';
-
-          let parsedArray = JSON.parse(inArray);
-          for (let single of parsedArray) {
-            let object = single.row.columns;
-            object[3] = JSON.parse(object[3]).map((entity: any) =>{
-              return entity.Text;
-            });
-            let tweet = new Tweet(object[0], object[1], object[2], object[3]);
-            germany.tweets.push(tweet);
-            socket.emit('tweets', tweet);
-          }
-          germanCache = "";
-        } catch(e) {
-          germanCache += jsonString;
-          /*if(germanErrorCount++ > 50) {
-            germanErrorCount = 0;
-            germanCache = "";
-          }*/
-          if(e.message == germanCachedMessage) {
-            germanCache = "";
-          }
-          germanCachedMessage = e.message;
-          console.log(e);
-
-        }
-
-        if (germany.tweets.length > 10000) {
-          germany.tweets.shift();
-        }
-      }
     });
   });
 
@@ -168,30 +132,6 @@ router.post('/query', function(req: Request, res: Response) {
     json: true
   }).on('data', (data: Buffer) => {
     res.write(data.toString('utf8'));
-  }).on('end', () => {
-    res.end();
-  })
-});
-
-router.get('/tweets/:topic', function(req: Request, res: Response) {
-  let topic = req.params['topic'];
-  request({
-    method: 'POST',
-    body: {
-      'ksql': 'SELECT * FROM ' + topic
-    },
-    uri: 'http://localhost:8088/query',
-    json: true
-  }).on('data', (data: Buffer) => {
-    let obj = data.toString('utf8');
-    switch(topic) {
-      case 'germany':
-        germany.tweets.push(obj);
-        if (germany.tweets.length > 100) {
-          germany.tweets.shift();
-        }
-        break;
-    }
   }).on('end', () => {
     res.end();
   })
