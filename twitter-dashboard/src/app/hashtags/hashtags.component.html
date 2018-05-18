@@ -1,0 +1,10 @@
+<mat-list>
+  <ng-container *ngFor="let tag of this.displayTags">
+    <mat-list-item>
+      {{tag[0]}}
+      <span class="tagAmount">{{tag[1]}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+  </ng-container>
+
+</mat-list>
