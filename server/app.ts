@@ -70,6 +70,7 @@ let io = socket(server);
 
 let germanCache = "";
 let germanErrorCount = 0;
+let germanCachedMessage = "";
 
 io.on('connection', (socket) => {
   console.log('made socket connection', socket.id);
@@ -78,7 +79,7 @@ io.on('connection', (socket) => {
     request({
       method: 'POST',
       body: {
-        'ksql': 'SELECT CREATEDAT, USER_NAME, TEXT FROM GERMANY;',
+        'ksql': 'SELECT CREATEDAT, USER_NAME, TEXT, HASHTAGENTITIES FROM GERMANY;',
         'streamsProperties': {
           'ksql.streams.auto.offset.reset': 'earliest'
         }
@@ -96,17 +97,24 @@ io.on('connection', (socket) => {
           let parsedArray = JSON.parse(inArray);
           for (let single of parsedArray) {
             let object = single.row.columns;
-            let tweet = new Tweet(object[0], object[1], object[2])
+            object[3] = JSON.parse(object[3]).map((entity: any) =>{
+              return entity.Text;
+            });
+            let tweet = new Tweet(object[0], object[1], object[2], object[3]);
             germany.tweets.push(tweet);
             socket.emit('tweets', tweet);
           }
           germanCache = "";
         } catch(e) {
           germanCache += jsonString;
-          if(germanErrorCount++ > 100) {
+          /*if(germanErrorCount++ > 50) {
             germanErrorCount = 0;
             germanCache = "";
+          }*/
+          if(e.message == germanCachedMessage) {
+            germanCache = "";
           }
+          germanCachedMessage = e.message;
           console.log(e);
 
         }
