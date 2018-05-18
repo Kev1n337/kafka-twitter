@@ -6,4 +6,6 @@ export class Topic {
     this.name = name;
     this.tweets = [];
   }
+
+
 }
