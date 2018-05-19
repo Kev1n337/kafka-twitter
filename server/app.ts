@@ -1,45 +1,15 @@
 import * as express from 'express';
 import {Request, Response} from 'express';
-import * as request from 'request-promise';
 import * as bodyParser from 'body-parser';
 import * as socket from 'socket.io';
 import {Topic} from './model/Topic';
-import {Tweet} from './model/Tweet';
 
 
 let router = express();
 
 let germany = new Topic('Germany');
-
-request({
-  method: 'POST',
-  body: {
-    'ksql': 'SELECT CREATEDAT, USER_NAME, TEXT, HASHTAGENTITIES FROM GERMANY;',
-    'streamsProperties': {
-      'ksql.streams.auto.offset.reset': 'earliest'
-    }
-  },
-  uri: 'http://localhost:8088/query',
-  json: true
-}).on('data', (data: Buffer) => {
-  data.toString('utf8').trim().split("\n").forEach(line => {
-    if (line == "") { return; }
-    try {
-      let object = JSON.parse(line).row.columns;
-      object[3] = JSON.parse(object[3]).map(entity => entity.Text);
-      let tweet = new Tweet(object[0], object[1], object[2], object[3]);
-      germany.tweets.push(tweet);
-      if(germany.tweets.length > 10000) { germany.tweets.shift(); }
-      germany.calculateTags(tweet.hashtags);
-      germany.calculatePersons(tweet.name);
-      germany.emitter.emit('tweet', tweet);
-      console.log(tweet.time);
-    } catch (e) {
-      console.log(e);
-    }
-  });
-});
-
+let trump = new Topic('Trump');
+let cloud = new Topic('Cloud');
 
 router.use(bodyParser.json());
 
@@ -65,6 +35,21 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('trump', function( user ){
+    trump.emitter.on('tweet', (tweet) => {
+      socket.emit('tweets', tweet);
+      socket.emit('tags', trump.hashDict);
+      socket.emit('person', trump.nameDict);
+    });
+  });
+
+  socket.on('cloud', function( user ){
+    cloud.emitter.on('tweet', (tweet) => {
+      socket.emit('tweets', tweet);
+      socket.emit('tags', cloud.hashDict);
+      socket.emit('person', cloud.nameDict);
+    });
+  });
 });
 
 router.get("/collection/:stream", (req: Request, res: Response) => {
@@ -72,6 +57,11 @@ router.get("/collection/:stream", (req: Request, res: Response) => {
     case 'germany':
       res.json({topic: germany});
       break;
+    case 'trump':
+      res.json({topic: trump});
+      break;
+    case 'cloud':
+      res.json({topic: cloud});
     default:
       res.status(404).json({message: 'Stream not found'});
   }

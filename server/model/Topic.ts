@@ -1,5 +1,6 @@
 import {Tweet} from './Tweet';
 import {EventEmitter} from 'events';
+import request = require('request-promise');
 
 export class Topic {
   name: string;
@@ -14,6 +15,7 @@ export class Topic {
     this.emitter = new EventEmitter();
     this.hashDict = {};
     this.nameDict = {};
+    this.fetchTweets();
   }
 
   public calculateTags(hashtags: string[]) {
@@ -32,6 +34,37 @@ export class Topic {
     } else {
       this.nameDict[name] = 1;
     }
+  }
+
+  public fetchTweets() {
+    request({
+      method: 'POST',
+      body: {
+        'ksql': `SELECT CREATEDAT, USER_NAME, TEXT, HASHTAGENTITIES FROM ${this.name};`,
+        'streamsProperties': {
+          'ksql.streams.auto.offset.reset': 'earliest'
+        }
+      },
+      uri: 'http://localhost:8088/query',
+      json: true
+    }).on('data', (data: Buffer) => {
+      data.toString('utf8').trim().split("\n").forEach(line => {
+        if (line == "") { return; }
+        try {
+          let object = JSON.parse(line).row.columns;
+          object[3] = JSON.parse(object[3]).map(entity => entity.Text);
+          let tweet = new Tweet(object[0], object[1], object[2], object[3]);
+          this.tweets.push(tweet);
+          if(this.tweets.length > 10000) { this.tweets.shift(); }
+          this.calculateTags(tweet.hashtags);
+          this.calculatePersons(tweet.name);
+          this.emitter.emit('tweet', tweet);
+          console.log(tweet.time);
+        } catch (e) {
+          console.log(e);
+        }
+      });
+    });
   }
 
 }
