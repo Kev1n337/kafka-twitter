@@ -1,17 +1,13 @@
-import {MongoClient, Db, MongoError} from 'mongodb';
 import * as express from 'express';
 import {Request, Response} from 'express';
 import * as request from 'request-promise';
-import bodyParser = require ("body-parser");
+import * as bodyParser from 'body-parser';
 import * as socket from 'socket.io';
 import {Topic} from './model/Topic';
 import {Tweet} from './model/Tweet';
-import {EventEmitter} from 'events';
 
 
 let router = express();
-
-let germanEmitter = new EventEmitter();
 
 let germany = new Topic('Germany');
 
@@ -34,14 +30,13 @@ request({
       let tweet = new Tweet(object[0], object[1], object[2], object[3]);
       germany.tweets.push(tweet);
       if(germany.tweets.length > 10000) { germany.tweets.shift(); }
-      germanEmitter.emit('germanTweet', tweet);
-      console.log(germany.tweets.length);
+      germany.calculateTags(tweet.hashtags);
+      germany.emitter.emit('tweet', tweet);
     } catch (e) {
       console.log(e);
     }
   });
 });
-
 
 
 router.use(bodyParser.json());
@@ -61,8 +56,9 @@ io.on('connection', (socket) => {
   console.log('made socket connection', socket.id);
 
   socket.on('germany', function( user ){
-    germanEmitter.on('germanTweet', (tweet) => {
+    germany.emitter.on('tweet', (tweet) => {
       socket.emit('tweets', tweet);
+      socket.emit('tags', germany.hashDict);
     });
   });
 
@@ -71,7 +67,7 @@ io.on('connection', (socket) => {
 router.get("/collection/:stream", (req: Request, res: Response) => {
   switch(req.params['stream']) {
     case 'germany':
-      res.json({tweets: germany.tweets});
+      res.json({topic: germany});
       break;
     default:
       res.status(404).json({message: 'Stream not found'});
