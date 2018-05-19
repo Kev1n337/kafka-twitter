@@ -5,6 +5,7 @@ export class Topic {
   name: string;
   tweets: Tweet[];
   hashDict: { [id: string]: number};
+  nameDict: { [id: string]: number};
   emitter: EventEmitter;
 
   constructor(name: string) {
@@ -12,6 +13,7 @@ export class Topic {
     this.tweets = [];
     this.emitter = new EventEmitter();
     this.hashDict = {};
+    this.nameDict = {};
   }
 
   public calculateTags(hashtags: string[]) {
@@ -21,6 +23,14 @@ export class Topic {
       } else {
         this.hashDict[tag] = 1;
       }
+    }
+  }
+
+  public calculatePersons (name: string) {
+    if(this.nameDict[name]) {
+      this.nameDict[name]++;
+    } else {
+      this.nameDict[name] = 1;
     }
   }
 

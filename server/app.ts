@@ -31,7 +31,9 @@ request({
       germany.tweets.push(tweet);
       if(germany.tweets.length > 10000) { germany.tweets.shift(); }
       germany.calculateTags(tweet.hashtags);
+      germany.calculatePersons(tweet.name);
       germany.emitter.emit('tweet', tweet);
+      console.log(tweet.time);
     } catch (e) {
       console.log(e);
     }
@@ -59,6 +61,7 @@ io.on('connection', (socket) => {
     germany.emitter.on('tweet', (tweet) => {
       socket.emit('tweets', tweet);
       socket.emit('tags', germany.hashDict);
+      socket.emit('person', germany.nameDict);
     });
   });
 
