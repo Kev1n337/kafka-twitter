@@ -17,13 +17,12 @@ export class TweetFeedComponent implements OnInit {
   constructor(private ksql: KsqlService) {}
 
   ngOnInit() {
-    this.ksql.germanTweetAdded$.subscribe((tweet: Tweet) => {
+    this.ksql.germany.tweetAdded$.subscribe((tweet: Tweet) => {
       this.displayedTweets.push(tweet);
       if (this.displayedTweets.length > 5) {
         this.displayedTweets.shift();
       }
       this.dataSource.data = this.displayedTweets;
-      console.log('Datasource updated');
     });
   }
 

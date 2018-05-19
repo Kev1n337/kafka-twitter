@@ -7,14 +7,10 @@ import {KsqlService} from '../ksql.service';
   styleUrls: ['./twitter-dashboard.component.css']
 })
 export class TwitterDashboardComponent implements OnInit {
-
-  data = [];
-
-
-  constructor(private ksql: KsqlService) {}
+  constructor(public ksql: KsqlService) {}
 
   ngOnInit() {
-    this.ksql.initSocket();
+    this.ksql.initGermany();
   }
 
 
