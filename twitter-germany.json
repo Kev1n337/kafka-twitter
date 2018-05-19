@@ -1,17 +1,17 @@
 {
- "name": "twitter_source_json_01",
+ "name": "twitter_germany",
  "config": {
    "connector.class": "com.github.jcustenborder.kafka.connect.twitter.TwitterSourceConnector",
    "twitter.oauth.accessToken": "xxx",
    "twitter.oauth.consumerSecret": "xxx",
    "twitter.oauth.consumerKey": "xxx",
-   "twitter.oauth.accessTokenSecret": "xxxx"
-   "kafka.delete.topic": "twitter_deletes_json_01",
+   "twitter.oauth.accessTokenSecret": "xxx",
+   "kafka.delete.topic": "twitter_deletes_germany",
    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
    "value.converter.schemas.enable": false,
    "key.converter.schemas.enable": false,
-   "kafka.status.topic": "twitter_json_01",
+   "kafka.status.topic": "twitter_germany",
    "process.deletes": true,
    "filter.keywords": "germany"
  }
