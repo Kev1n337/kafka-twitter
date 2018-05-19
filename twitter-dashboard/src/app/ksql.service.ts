@@ -22,6 +22,7 @@ export class KsqlService {
     this.httpClient.get('http://localhost:8080/collection/germany').subscribe((data: any) => {
       this.germany.tweets = data.topic.tweets;
       this.germany.hashDict = data.topic.hashDict;
+      this.germany.nameDict = data.topic.nameDict;
 
       this.germanTweetsFetchedSource.next();
     });

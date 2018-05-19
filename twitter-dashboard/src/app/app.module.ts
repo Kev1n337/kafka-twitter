@@ -22,6 +22,7 @@ import {KsqlService} from './ksql.service';
 import {HttpClientModule} from '@angular/common/http';
 import { TweetFeedComponent } from './tweet-feed/tweet-feed.component';
 import { HashtagsComponent } from './hashtags/hashtags.component';
+import { TopUserComponent } from './top-user/top-user.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { HashtagsComponent } from './hashtags/hashtags.component';
     TwitterDashboardComponent,
     NavigationComponent,
     TweetFeedComponent,
-    HashtagsComponent
+    HashtagsComponent,
+    TopUserComponent
   ],
   imports: [
     BrowserModule,

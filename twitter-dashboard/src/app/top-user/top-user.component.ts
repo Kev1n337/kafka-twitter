@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import {KsqlService} from '../ksql.service';
 import {Tweet} from '../tweet.model';
+import {KsqlService} from '../ksql.service';
 
 @Component({
-  selector: 'app-hashtags',
-  templateUrl: './hashtags.component.html',
-  styleUrls: ['./hashtags.component.css']
+  selector: 'app-top-user',
+  templateUrl: './top-user.component.html',
+  styleUrls: ['./top-user.component.css']
 })
-export class HashtagsComponent implements OnInit {
+export class TopUserComponent implements OnInit {
 
-  public displayTags = [];
+  public displayNames = [];
 
   constructor(private ksql: KsqlService) { }
 
@@ -24,8 +24,8 @@ export class HashtagsComponent implements OnInit {
   }
 
   sortData() {
-    const items = Object.keys(this.ksql.germany.hashDict).map(key => [key, this.ksql.germany.hashDict[key]]);
+    const items = Object.keys(this.ksql.germany.nameDict).map(key => [key, this.ksql.germany.nameDict[key]]);
     items.sort((first: any, second: any) => second[1] - first[1]);
-    this.displayTags = items.slice(0, 8);
+    this.displayNames = items.slice(0, 8);
   }
 }
