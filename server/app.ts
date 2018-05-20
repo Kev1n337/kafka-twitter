@@ -68,6 +68,7 @@ router.get("/collection/:stream", (req: Request, res: Response) => {
         nameDict: cloud.nameDict,
         hashDict: cloud.hashDict
       });
+      break;
     default:
       res.status(404).json({message: 'Stream not found'});
   }
