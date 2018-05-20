@@ -20,16 +20,34 @@ export class Topic {
 
   public initSocket(): void {
     this.socket.emit(this.name.toLowerCase());
-    this.socket.on('tweets', (data) => {
+    this.socket.on('newTweet', (data: Tweet) => {
       console.log(this.name);
       this.tweets.push(data);
       if (this.tweets.length > 10000) {
         this.tweets.shift();
       }
+      this.calcTags(data.hashtags);
+      this.calcUsers(data.name);
       this.tweetAddedSource.next(data);
     });
-    this.socket.on('tags', tags => this.hashDict = tags );
-    this.socket.on('person', persons => this.nameDict = persons);
+  }
+
+  private calcTags(hashtags: string[]) {
+    for (const tag of hashtags) {
+      if (this.hashDict[tag]) {
+        this.hashDict[tag]++;
+      } else {
+        this.hashDict[tag] = 1;
+      }
+    }
+  }
+
+  private calcUsers(user: string) {
+    if (this.nameDict[name]) {
+      this.nameDict[name]++;
+    } else {
+      this.nameDict[name] = 1;
+    }
   }
 
 }

@@ -22,14 +22,14 @@ export class TweetFeedComponent implements OnInit {
     this.ksql.topicChanged$.subscribe(() => {
       this.displayedTweets = [];
       this.dataSource.data = this.displayedTweets;
-    });
 
-    this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
-      this.displayedTweets.push(tweet);
-      if (this.displayedTweets.length > 5) {
-        this.displayedTweets.shift();
-      }
-      this.dataSource.data = this.displayedTweets;
+      this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
+        this.displayedTweets.push(tweet);
+        if (this.displayedTweets.length > 5) {
+          this.displayedTweets.shift();
+        }
+        this.dataSource.data = this.displayedTweets;
+      });
     });
   }
 

@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {KsqlService} from '../ksql.service';
-import {ActivatedRoute, ParamMap} from '@angular/router';
-import {switchMap} from 'rxjs/operators';
-import {Topic} from '../topic.model';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-twitter-dashboard',
@@ -28,6 +26,4 @@ export class TwitterDashboardComponent implements OnInit {
       }
     });
   }
-
-
 }
