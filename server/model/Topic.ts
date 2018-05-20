@@ -8,6 +8,8 @@ export class Topic {
   hashDict: { [id: string]: number};
   nameDict: { [id: string]: number};
   emitter: EventEmitter;
+  serviceDown: boolean;
+  static cacheSize = 5000;
 
   constructor(name: string) {
     this.name = name;
@@ -16,6 +18,8 @@ export class Topic {
     this.hashDict = {};
     this.nameDict = {};
     this.fetchTweets();
+    this.serviceDown = false;
+    this.checkTopicStatus();
   }
 
   public calculateTags(hashtags: string[]) {
@@ -26,6 +30,11 @@ export class Topic {
         this.hashDict[tag] = 1;
       }
     }
+    if(this.tweets.length > 5000) {
+      for (const tag of this.tweets[0].hashtags) {
+        this.hashDict[tag]--;
+      }
+    }
   }
 
   public calculatePersons (name: string) {
@@ -33,6 +42,10 @@ export class Topic {
       this.nameDict[name]++;
     } else {
       this.nameDict[name] = 1;
+    }
+
+    if (this.tweets.length > 5000) {
+      this.nameDict[this.tweets[0].name]--;
     }
   }
 
@@ -54,17 +67,37 @@ export class Topic {
           let object = JSON.parse(line).row.columns;
           object[3] = JSON.parse(object[3]).map(entity => entity.Text);
           let tweet = new Tweet(object[0], object[1], object[2], object[3]);
+          this.serviceDown = false;
           this.tweets.push(tweet);
-          if(this.tweets.length > 10000) { this.tweets.shift(); }
           this.calculateTags(tweet.hashtags);
           this.calculatePersons(tweet.name);
-          this.emitter.emit('tweet', tweet);
+          if(this.tweets.length > 5000) {
+            this.tweets.shift();
+          }
           console.log(this.name, tweet.time);
+          this.emitter.emit('tweet', tweet);
         } catch (e) {
-          console.log(e);
         }
       });
     });
+  }
+
+  private checkTopicStatus() {
+    this.serviceDown = true;
+    setTimeout(() => {
+      if(this.serviceDown == true) {
+        request({
+          method: 'POST',
+          body: {
+            'ksql': `DROP STREAM ${this.name}; CREATE STREAM ${this.name} AS SELECT TIMESTAMPTOSTRING(CreatedAt, 'yyyy-MM-dd HH:mm:ss.SSS') AS CreatedAt, EXTRACTJSONFIELD(user,'$.Name') AS user_Name, Text,hashtagentities FROM ${this.name}_raw ;`
+          },
+          uri: 'http://localhost:8088/ksql',
+          json: true
+        });
+        throw Error('Stream is down');
+      }
+      this.checkTopicStatus();
+    }, 30000)
   }
 
 }
