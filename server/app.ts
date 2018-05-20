@@ -29,39 +29,45 @@ io.on('connection', (socket) => {
 
   socket.on('germany', function( user ){
     germany.emitter.on('tweet', (tweet) => {
-      socket.emit('tweets', tweet);
-      socket.emit('tags', germany.hashDict);
-      socket.emit('person', germany.nameDict);
+      socket.emit('newTweet', tweet);
     });
   });
 
   socket.on('trump', function( user ){
     trump.emitter.on('tweet', (tweet) => {
-      socket.emit('tweets', tweet);
-      socket.emit('tags', trump.hashDict);
-      socket.emit('person', trump.nameDict);
+      socket.emit('newTweet', tweet);
     });
   });
 
   socket.on('cloud', function( user ){
     cloud.emitter.on('tweet', (tweet) => {
-      socket.emit('tweets', tweet);
-      socket.emit('tags', cloud.hashDict);
-      socket.emit('person', cloud.nameDict);
+      socket.emit('newTweet', tweet);
     });
   });
 });
 
 router.get("/collection/:stream", (req: Request, res: Response) => {
-  switch(req.params['stream']) {
+  switch(req.params['stream'].toLowerCase()) {
     case 'germany':
-      res.json({topic: germany});
+      res.json({
+        tweets: germany.tweets,
+        nameDict: germany.nameDict,
+        hashDict: germany.hashDict
+      });
       break;
     case 'trump':
-      res.json({topic: trump});
+      res.json({
+        tweets: trump.tweets,
+        nameDict: trump.nameDict,
+        hashDict: trump.hashDict
+      });
       break;
     case 'cloud':
-      res.json({topic: cloud});
+      res.json({
+        tweets: cloud.tweets,
+        nameDict: cloud.nameDict,
+        hashDict: cloud.hashDict
+      });
     default:
       res.status(404).json({message: 'Stream not found'});
   }

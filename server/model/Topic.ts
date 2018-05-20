@@ -59,7 +59,7 @@ export class Topic {
           this.calculateTags(tweet.hashtags);
           this.calculatePersons(tweet.name);
           this.emitter.emit('tweet', tweet);
-          console.log(tweet.time);
+          console.log(this.name, tweet.time);
         } catch (e) {
           console.log(e);
         }
