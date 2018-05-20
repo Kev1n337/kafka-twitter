@@ -43,10 +43,10 @@ export class Topic {
   }
 
   private calcUsers(user: string) {
-    if (this.nameDict[name]) {
-      this.nameDict[name]++;
+    if (this.nameDict[user]) {
+      this.nameDict[user]++;
     } else {
-      this.nameDict[name] = 1;
+      this.nameDict[user] = 1;
     }
   }
 

@@ -1,21 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {Tweet} from '../tweet.model';
 import {KsqlService} from '../ksql.service';
-import {ActivatedRoute} from '@angular/router';
-import {Topic} from '../topic.model';
 
 @Component({
   selector: 'app-top-user',
   templateUrl: './top-user.component.html',
   styleUrls: ['./top-user.component.css']
 })
-export class TopUserComponent implements OnInit {
+export class TopUserComponent {
 
   public displayNames = [];
 
-  constructor(private ksql: KsqlService) { }
-
-  ngOnInit() {
+  constructor(private ksql: KsqlService) {
     this.ksql.topicChanged$.subscribe(() => {
       this.displayNames = [];
       this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {

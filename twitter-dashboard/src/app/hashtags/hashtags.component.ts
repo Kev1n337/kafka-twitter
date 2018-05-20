@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {KsqlService} from '../ksql.service';
 import {Tweet} from '../tweet.model';
 
@@ -7,13 +7,11 @@ import {Tweet} from '../tweet.model';
   templateUrl: './hashtags.component.html',
   styleUrls: ['./hashtags.component.css']
 })
-export class HashtagsComponent implements OnInit {
+export class HashtagsComponent {
 
   public displayTags = [];
 
-  constructor(private ksql: KsqlService) { }
-
-  ngOnInit() {
+  constructor(private ksql: KsqlService) {
     this.ksql.topicChanged$.subscribe(() => {
       this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
         this.sortData();

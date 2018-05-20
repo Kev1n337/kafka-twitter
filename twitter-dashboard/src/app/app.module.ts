@@ -23,6 +23,7 @@ import {HttpClientModule} from '@angular/common/http';
 import { TweetFeedComponent } from './tweet-feed/tweet-feed.component';
 import { HashtagsComponent } from './hashtags/hashtags.component';
 import { TopUserComponent } from './top-user/top-user.component';
+import { InstructionComponent } from './instruction/instruction.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { TopUserComponent } from './top-user/top-user.component';
     NavigationComponent,
     TweetFeedComponent,
     HashtagsComponent,
-    TopUserComponent
+    TopUserComponent,
+    InstructionComponent
   ],
   imports: [
     BrowserModule,
