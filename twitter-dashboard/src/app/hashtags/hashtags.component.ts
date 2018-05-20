@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {KsqlService} from '../ksql.service';
 import {Tweet} from '../tweet.model';
+import {Topic} from '../topic.model';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-hashtags',
@@ -14,17 +16,13 @@ export class HashtagsComponent implements OnInit {
   constructor(private ksql: KsqlService) { }
 
   ngOnInit() {
-    this.ksql.germanTweetsFetched$.subscribe(() => {
-      this.sortData();
-    });
-
-    this.ksql.germany.tweetAdded$.subscribe((tweet: Tweet) => {
+    this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
       this.sortData();
     });
   }
 
   sortData() {
-    const items = Object.keys(this.ksql.germany.hashDict).map(key => [key, this.ksql.germany.hashDict[key]]);
+    const items = Object.keys(this.ksql.currentTopic.hashDict).map(key => [key, this.ksql.currentTopic.hashDict[key]]);
     items.sort((first: any, second: any) => second[1] - first[1]);
     this.displayTags = items.slice(0, 8);
   }

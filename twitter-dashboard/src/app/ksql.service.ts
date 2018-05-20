@@ -3,7 +3,6 @@ import {HttpClient} from '@angular/common/http';
 import {http} from 'stream-http';
 import * as socket from 'socket.io-client';
 import {Subject} from 'rxjs';
-import {Tweet} from './tweet.model';
 import {Topic} from './topic.model';
 
 @Injectable({
@@ -12,24 +11,30 @@ import {Topic} from './topic.model';
 export class KsqlService {
 
   public germany: Topic;
+  public trump: Topic;
+  public cloud: Topic;
+
+  public currentTopic;
+
   private socket;
 
-  private germanTweetsFetchedSource = new Subject<void>();
-  germanTweetsFetched$ = this.germanTweetsFetchedSource.asObservable();
+  private tweetsFetchedSource = new Subject<void>();
+  tweetsFetched$ = this.tweetsFetchedSource.asObservable();
 
   constructor(private httpClient: HttpClient) {
     this.socket = socket('http://localhost:8080');
-    this.httpClient.get('http://localhost:8080/collection/germany').subscribe((data: any) => {
-      this.germany.tweets = data.topic.tweets;
-      this.germany.hashDict = data.topic.hashDict;
-      this.germany.nameDict = data.topic.nameDict;
-
-      this.germanTweetsFetchedSource.next();
-    });
   }
 
-  public initGermany(): void {
-    this.germany = new Topic();
-    this.germany.initSocket(this.socket);
+  public changeTopic(topic: string): void {
+    this.currentTopic = new Topic(topic);
+    this.httpClient.get(`http://localhost:8080/collection/${topic}`).subscribe((data: any) => {
+      this.currentTopic.tweets = data.topic.tweets;
+      this.currentTopic.hashDict = data.topic.hashDict;
+      this.currentTopic.nameDict = data.topic.nameDict;
+
+      this.tweetsFetchedSource.next();
+    });
+
+    this.currentTopic.initSocket(this.socket);
   }
 }

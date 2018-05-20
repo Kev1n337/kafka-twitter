@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {MatTableDataSource} from '@angular/material';
 import {KsqlService} from '../ksql.service';
 import {Tweet} from '../tweet.model';
+import {ActivatedRoute} from '@angular/router';
+import {Topic} from '../topic.model';
 
 @Component({
   selector: 'app-tweet-feed',
@@ -17,7 +19,8 @@ export class TweetFeedComponent implements OnInit {
   constructor(private ksql: KsqlService) {}
 
   ngOnInit() {
-    this.ksql.germany.tweetAdded$.subscribe((tweet: Tweet) => {
+
+    this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
       this.displayedTweets.push(tweet);
       if (this.displayedTweets.length > 5) {
         this.displayedTweets.shift();

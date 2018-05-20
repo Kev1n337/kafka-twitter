@@ -11,24 +11,17 @@ export class Topic {
   private tweetAddedSource = new Subject<Tweet>();
   tweetAdded$ = this.tweetAddedSource.asObservable();
 
-  constructor() {}
-
-  public calculateTags(hashtags: string[]) {
-    for (const tag of hashtags) {
-      if (this.hashDict[tag]) {
-        this.hashDict[tag]++;
-      } else {
-        this.hashDict[tag] = 1;
-      }
-    }
+  constructor(name: string) {
+    this.name = name;
   }
 
   public initSocket(socket: Socket): void {
-    socket.emit('germany');
+    console.log('Topic init', this.name);
+    socket.emit(this.name.toLowerCase());
     socket.on('tweets', (data: Tweet) => {
       this.tweets.push(data);
-      // this.calculateTags(data.hashtags);
-
+      console.log('Tweet added', this.name)
+      console.log(data);
       if (this.tweets.length > 10000) {
         this.tweets.shift();
       }
