@@ -9,32 +9,24 @@ import {Topic} from './topic.model';
   providedIn: 'root'
 })
 export class KsqlService {
-
-  public germany: Topic;
-  public trump: Topic;
-  public cloud: Topic;
-
   public currentTopic;
 
-  private socket;
-
-  private tweetsFetchedSource = new Subject<void>();
-  tweetsFetched$ = this.tweetsFetchedSource.asObservable();
+  private topicChangedSource = new Subject<void>();
+  topicChanged$ = this.topicChangedSource.asObservable();
 
   constructor(private httpClient: HttpClient) {
-    this.socket = socket('http://localhost:8080');
   }
 
   public changeTopic(topic: string): void {
+    if (this.currentTopic) { this.currentTopic.socket.close(); }
     this.currentTopic = new Topic(topic);
+    this.topicChangedSource.next();
     this.httpClient.get(`http://localhost:8080/collection/${topic}`).subscribe((data: any) => {
       this.currentTopic.tweets = data.topic.tweets;
       this.currentTopic.hashDict = data.topic.hashDict;
       this.currentTopic.nameDict = data.topic.nameDict;
-
-      this.tweetsFetchedSource.next();
     });
 
-    this.currentTopic.initSocket(this.socket);
+    this.currentTopic.initSocket(socket('http://localhost:8080'));
   }
 }

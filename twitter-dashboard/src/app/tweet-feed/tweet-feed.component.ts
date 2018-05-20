@@ -19,6 +19,10 @@ export class TweetFeedComponent implements OnInit {
   constructor(private ksql: KsqlService) {}
 
   ngOnInit() {
+    this.ksql.topicChanged$.subscribe(() => {
+      this.displayedTweets = [];
+      this.dataSource.data = this.displayedTweets;
+    });
 
     this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
       this.displayedTweets.push(tweet);
