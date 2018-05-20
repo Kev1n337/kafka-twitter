@@ -1,5 +1,6 @@
 <mat-list>
   <mat-list-item *ngFor="let tag of this.displayNames; let i = index;">
-    {{i+1}}. {{tag[0]}} {{tag[1]}}
+    <div>{{i+1}}. {{tag[0]}}</div>
+    <div> {{tag[1]}}</div>
   </mat-list-item>
 </mat-list>
