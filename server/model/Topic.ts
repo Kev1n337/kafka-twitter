@@ -94,10 +94,9 @@ export class Topic {
           uri: 'http://localhost:8088/ksql',
           json: true
         });
-        throw Error('Stream is down');
       }
       this.checkTopicStatus();
-    }, 30000)
+    }, 120000);
   }
 
 }
