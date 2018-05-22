@@ -58,7 +58,7 @@ Using KSQL streams and tables could be created by:
 CREATE STREAM germany_raw (CreatedAt bigint,Id bigint, Text VARCHAR, SOURCE VARCHAR, Truncated VARCHAR, InReplyToStatusId VARCHAR, InReplyToUserId VARCHAR, InReplyToScreenName VARCHAR, GeoLocation VARCHAR, Place VARCHAR, Favorited VARCHAR, Retweeted VARCHAR, FavoriteCount VARCHAR, User VARCHAR, Retweet VARCHAR, Contributors VARCHAR, RetweetCount VARCHAR, RetweetedByMe VARCHAR, CurrentUserRetweetId VARCHAR, PossiblySensitive VARCHAR, Lang VARCHAR, WithheldInCountries VARCHAR, HashtagEntities VARCHAR, UserMentionEntities VARCHAR, MediaEntities VARCHAR, SymbolEntities VARCHAR, URLEntities VARCHAR) WITH (KAFKA_TOPIC='twitter_germany',VALUE_FORMAT='JSON');
 ```
 ```
-CREATE STREAM germany AS SELECT TIMESTAMPTOSTRING(CreatedAt, 'yyyy-MM-dd HH:mm:ss.SSS') AS CreatedAt, EXTRACTJSONFIELD(user,'$.Name') AS user_Name, EXTRACTJSONFIELD(user,'$.ScreenName') AS user_ScreenName, EXTRACTJSONFIELD(user,'$.Location') AS user_Location, EXTRACTJSONFIELD(user,'$.Description') AS user_Description, Text,hashtagentities,lang FROM germany_raw ;
+CREATE STREAM germany AS SELECT TIMESTAMPTOSTRING(CreatedAt, 'yyyy-MM-dd HH:mm:ss.SSS') AS CreatedAt, EXTRACTJSONFIELD(user,'$.Name') AS user_Name, Text,hashtagentities FROM germany_raw ;
 ```
 
 ```
@@ -68,6 +68,4 @@ CREATE TABLE user_germany_count AS SELECT user_screenname, count(*) AS  tweet_co
 ```
 CREATE TABLE USER_GERMANY_COUNT_DISPLAY AS SELECT TIMESTAMPTOSTRING(ROWTIME, 'yyyy-MM-dd HH:mm:ss.SSS') AS WINDOW_START, USER_SCREENNAME, TWEET_COUNT FROM user_germany_count;
 ```
-
-
 
