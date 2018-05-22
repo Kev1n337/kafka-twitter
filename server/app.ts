@@ -8,7 +8,7 @@ import {Topic} from './model/Topic';
 let router = express();
 
 let germany = new Topic('Germany');
-let trump = new Topic('Trump');
+let developer = new Topic('Developer');
 let cloud = new Topic('Cloud');
 
 router.use(bodyParser.json());
@@ -33,8 +33,8 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('trump', function( user ){
-    trump.emitter.on('tweet', (tweet) => {
+  socket.on('developer', function( user ){
+    developer.emitter.on('tweet', (tweet) => {
       socket.emit('newTweet', tweet);
     });
   });
@@ -55,11 +55,11 @@ router.get("/collection/:stream", (req: Request, res: Response) => {
         hashDict: germany.hashDict
       });
       break;
-    case 'trump':
+    case 'developer':
       res.json({
-        tweets: trump.tweets,
-        nameDict: trump.nameDict,
-        hashDict: trump.hashDict
+        tweets: developer.tweets,
+        nameDict: developer.nameDict,
+        hashDict: developer.hashDict
       });
       break;
     case 'cloud':

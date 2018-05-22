@@ -17,8 +17,8 @@ export class TwitterDashboardComponent implements OnInit {
         case 'germany':
           this.ksql.changeTopic('Germany');
           break;
-        case 'trump':
-          this.ksql.changeTopic('Trump');
+        case 'developer':
+          this.ksql.changeTopic('Developer');
           break;
         case 'cloud':
           this.ksql.changeTopic('Cloud');
