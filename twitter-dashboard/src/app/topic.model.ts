@@ -15,7 +15,7 @@ export class Topic {
 
   constructor(name: string) {
     this.name = name;
-    this.socket = socket('localhost:8080');
+    this.socket = socket('/');
   }
 
   public initSocket(): void {

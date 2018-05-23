@@ -20,7 +20,7 @@ export class KsqlService {
     if (this.currentTopic) { this.currentTopic.socket.close(); }
     this.currentTopic = new Topic(topic);
     this.topicChangedSource.next();
-    this.httpClient.get(`http://localhost:8080/collection/${topic}`).subscribe((data: any) => {
+    this.httpClient.get(`/collection/${topic}`).subscribe((data: any) => {
       this.currentTopic.tweets = data.tweets;
       this.currentTopic.hashDict = data.hashDict;
       this.currentTopic.nameDict = data.nameDict;

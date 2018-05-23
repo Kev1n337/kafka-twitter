@@ -74,3 +74,5 @@ router.get("/collection/:stream", (req: Request, res: Response) => {
   }
 });
 
+router.use('/', express.static(__dirname + '/../twitter-dashboard/dist/twitter-dashboard'));
+router.use('/*', express.static(__dirname + '/../twitter-dashboard/dist/twitter-dashboard'));

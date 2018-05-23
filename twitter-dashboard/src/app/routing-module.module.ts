@@ -6,7 +6,7 @@ import {InstructionComponent} from './instruction/instruction.component';
 
 const routes: Routes = [
   { path: '', component: InstructionComponent },
-  { path: 'collection/:topic', component: TwitterDashboardComponent},
+  { path: 'topic/:topic', component: TwitterDashboardComponent},
 ];
 
 @NgModule({
