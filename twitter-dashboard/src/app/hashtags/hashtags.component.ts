@@ -13,9 +13,14 @@ export class HashtagsComponent {
 
   constructor(private ksql: KsqlService) {
     this.ksql.topicChanged$.subscribe(() => {
+      this.displayTags = [];
       this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
         this.sortData();
       });
+    });
+
+    this.ksql.tweetsFetched$.subscribe(() => {
+      this.sortData();
     });
   }
 

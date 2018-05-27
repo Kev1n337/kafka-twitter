@@ -18,6 +18,10 @@ export class TopUserComponent {
         this.sortData();
       });
     });
+
+    this.ksql.tweetsFetched$.subscribe(() => {
+      this.sortData();
+    });
   }
 
   sortData() {

@@ -13,6 +13,9 @@ export class KsqlService {
   private topicChangedSource = new Subject<void>();
   topicChanged$ = this.topicChangedSource.asObservable();
 
+  private tweetsFetchedSource = new Subject<void>();
+  tweetsFetched$ = this.tweetsFetchedSource.asObservable();
+
   constructor(private httpClient: HttpClient) {
   }
 
@@ -24,6 +27,7 @@ export class KsqlService {
       this.currentTopic.tweets = data.tweets;
       this.currentTopic.hashDict = data.hashDict;
       this.currentTopic.nameDict = data.nameDict;
+      this.tweetsFetchedSource.next();
       console.log('Successfully fetched', data.tweets.length);
     });
 
