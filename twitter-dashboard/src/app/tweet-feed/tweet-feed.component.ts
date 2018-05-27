@@ -16,6 +16,11 @@ export class TweetFeedComponent {
     this.ksql.topicChanged$.subscribe(() => {
       this.displayedTweets = [];
 
+      this.ksql.tweetsFetched$.subscribe(() => {
+        let tweets = this.ksql.currentTopic.tweets;
+        this.displayedTweets = tweets.slice(tweets.length - 6, tweets.length - 1)
+      });
+      
       this.ksql.currentTopic.tweetAdded$.subscribe((tweet: Tweet) => {
         this.displayedTweets.push(tweet);
         if (this.displayedTweets.length > 5) {
